@@ -9,6 +9,12 @@ import { config } from './utils/config';
 import { NotifyProvider } from './context/web3/notify';
 import { NetworkStatsProvider } from './context/network';
 import { CruciblesProvider } from './context/crucibles';
+import { ChakraProvider } from '@chakra-ui/react';
+import { GlobalStyles } from './styles/global-styles';
+import { Global } from '@emotion/react';
+import theme from './config/theme';
+
+import 'focus-visible/dist/focus-visible';
 
 const { mistTokenAddress, lpTokenAddress, networkId } = config;
 
@@ -36,7 +42,10 @@ ReactDOM.render(
       <NotifyProvider>
         <NetworkStatsProvider>
           <CruciblesProvider>
-            <App />
+            <ChakraProvider theme={theme}>
+              <Global styles={GlobalStyles} />
+              <App />
+            </ChakraProvider>
           </CruciblesProvider>
         </NetworkStatsProvider>
       </NotifyProvider>
