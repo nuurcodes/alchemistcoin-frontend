@@ -6,6 +6,12 @@ import { formatUnits } from 'ethers/lib/utils';
 import { getTokenBalances } from '../../contracts/getTokenBalances';
 import { getOwnedCrucibles } from '../../contracts/getOwnedCrucibles';
 import { getUniswapBalances } from '../../contracts/getUniswapTokenBalances';
+import {
+  getUserRewards,
+  getNetworkStats,
+  calculateMistRewards,
+} from '../../contracts/aludel';
+import { IoCaretUpCircleOutline } from 'react-icons/io5';
 
 export type Crucible = {
   id: string;
@@ -94,6 +100,29 @@ const CruciblesProvider = ({ children }: CruciblesProps) => {
           }));
           setCrucibles(reformatted);
           setIsLoading(false);
+          return getUserRewards(signer, ownedCrucibles);
+        })
+        .then((rewards) => {
+          if (rewards?.length) {
+            Promise.all(
+              rewards.map((reward: any) => {
+                return new Promise((resolve, reject) => {
+                  resolve(
+                    calculateMistRewards(signer, reward.currStakeRewards)
+                  );
+                });
+              })
+            ).then((calculatedRewards) => {
+              let cruciblesWithRewards = crucibles?.map((crucible, i) => {
+                let calculatedReward: any = calculatedRewards[i];
+                return {
+                  ...crucible,
+                  ...calculatedReward,
+                };
+              });
+              setCrucibles(cruciblesWithRewards);
+            });
+          }
         })
         .catch((e) => {
           console.log(e);
